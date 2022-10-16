@@ -1,0 +1,18 @@
+{
+  "name": "nightskymagnify",
+  "version": "1.0.0",
+  "description": "Dimension by HTML5 UP\r html5up.net | @ajlkn\r Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)",
+  "main": "index.js",
+  "scripts": {
+    "s3-dev": "aws s3 cp . s3://nightskymagnify-dev --recursive --exclude \"node_modules/*\" --exclude \".git/*\"",
+    "s3-prod": "aws s3 cp . s3://nightskymagnify.com --recursive --exclude \"node_modules/*\" --exclude \".git/*\"",
+    "start":"index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "liteserver": "^0.3.0"
+  }
+}
