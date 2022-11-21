@@ -7,13 +7,14 @@
     "update-site": "aws cloudfront create-invalidation --distribution-id E29YNB4QKPBYQX --paths \"/*\"",
     "s3-dev": "aws s3 cp . s3://nightskymagnify-dev --recursive --exclude \"node_modules/*\" --exclude \".git/*\"",
     "s3-prod": "aws s3 cp . s3://nightskymagnify.com --recursive --exclude \"node_modules/*\" --exclude \".git/*\"",
-    "start":"lite-server",
+    "start": "lite-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "liteserver": "^0.3.0"
+    "liteserver": "^0.3.0",
+    "nodemailer": "^6.8.0"
   }
 }

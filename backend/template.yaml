@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description:
+  Email subscription handler for nightskymagnify.com
+
+Parameters:
+  env:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - prod
+  TableName:
+    Type: String
+    Default: "nightskymagnify-email-list"
+  pk:
+    Type: String
+    Default: email
+
+Resources:
+  EndpointFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: 
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+          - Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: !GetAtt DynamoTable.Arn
+      Environment:
+        Variables:
+          TABLENAME: !Sub '${env}-${TableName}'
+      Events:
+        Others:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        Base:
+          Type: HttpApi
+          Properties:
+            Path: / 
+            Method: ANY
+      MemorySize: 128
+      Timeout: 60
+
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: !Ref pk
+          AttributeType: S
+      KeySchema: 
+        - 
+          AttributeName: !Ref pk
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      TableName: !Sub ${env}-${TableName}
