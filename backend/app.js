@@ -1,16 +1,13 @@
-const keys = require("./keys");
 const api = require("lambda-api")();
+const functions = require("./functions");
 var nodemailer = require('nodemailer');
-const { DynamoDBClient, PutItemCommand, UpdateItemCommand} = require("@aws-sdk/client-dynamodb");
-const { marshall } = require("@aws-sdk/util-dynamodb");
-const dynamodb = new DynamoDBClient({region: process.env.REGION || "us-east-1"});
-const tableName = process.env.TABLENAME || "dev-nightskymagnify-email-list"
 const gmailUser = 'nightskymagnify@gmail.com';
+const gmailPass = process.env.EMAILPASS;
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: gmailUser,
-        pass: keys.gmailPass
+        pass: gmailPass
     }
 });
 
@@ -25,87 +22,78 @@ api.options('/*', (req,res) => {
 
 api.post("/email", async (req, res) => {
 
-    let action = req.body.action;
     let email = req.body.email;
     let firstName = req.body.firstName;
     let lastName = req.body.lastName;
 
-    if (action == "add") {
+    let queryResult = await functions.query(email,["email","active"]);
+
+    if (queryResult.length == 0) {
 
         let payload = {
             email: email,
             firstName: firstName,
             lastName: lastName,
-            active: true
+            active: true,
+            id: Date.now()
         }
-    
-        let params = {
-            TableName:tableName,
-            Item: marshall(payload)
+
+        let putResult = await functions.put(payload);
+
+        if (putResult.$metadata.httpStatusCode == 200) {
+            var mailOptions = {
+                from: `Magnify <${gmailUser}>`,
+                to: email,
+                subject: `Hey ${firstName}!`,
+                text: 'Thanks for subscribing! You will now be notified about any future events. See you soon!'
+            };
+            await transporter.sendMail(mailOptions);
         }
-    
-        let command = new PutItemCommand(params)
-      
-        let result = await dynamodb.send(command);
 
-        var mailOptions = {
-            from: gmailUser,
-            to: email,
-            subject: `Hey ${firstName}!`,
-            text: 'You will now be notified about any future events! See you soon!'
-        };
-    
-        transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-                console.log(error);
-            } else {
-                console.log('Email sent: ' + info.response);
-            }
-        });
-    
-        res.json(result.$metadata);
+        res.json({"message":"subscribed"});
 
-    }
-
-    else if (action == "remove") {
+    } else if (!queryResult[0].active) {
 
         let payload = {
-            active: false
-        }
+            active: true
+        };
 
-        let keys = Object.keys(payload)
+        await functions.update(email,payload);
 
-        let UE = [];
-        let EAN = {};
-        let EAV = {};
-        
-        for (let i=0;i<keys.length;i++)
-        {
-          EAN[`#${i}`] = keys[i];
-          EAV[`:${i}`] = payload[keys[i]];
-          UE.push(`#${i} = :${i}`)
-        }
-        
-        UE = "SET " + UE.join(", ")
-        
-        let params = {
-          TableName: tableName,
-          Key: marshall({email}),
-          UpdateExpression: UE,
-          ExpressionAttributeNames: EAN,
-          ExpressionAttributeValues: marshall(EAV),
-        }
-        
-        let command = new UpdateItemCommand(params)
-        let result = await dynamodb.send(command)
-        res.json(result.$metadata);
+        var mailOptions = {
+            from: `Magnify <${gmailUser}>`,
+            to: email,
+            subject: `Welcome back ${firstName}!`,
+            text: 'Thanks for subscribing again! You will be notified about any future events. Hope to see you soon!'
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({"message":"re-subscribed"});
 
     }
 
-})
+});
+
+api.delete("/email", async (req, res) => {
+
+    let email = req.query.email;
+    let id = req.query.id;
+
+    let payload = {
+        active: false
+    };
+
+    let queryResults = await functions.query(email,["email","id"])
+    if (queryResults.length != 0) {
+        if (queryResults[0]?.id == id) {
+            await functions.update(email,payload);
+            res.json({"message":"unsubscribed"});
+        };
+    };
+
+});
 
 exports.lambdaHandler = async (event, context) => {
-    let result = await api.run(event, context);
-    console.log(result);
-    return result;
+    return await api.run(event, context);
 };

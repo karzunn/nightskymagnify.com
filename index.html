@@ -19,11 +19,6 @@
 							<div class="inner">
 								<h1>Magnify</h1>
 								<p class="subText">"The heavens declare the glory of God; the skies proclaim the work of his hands." </br>- Psalms 19:1</p>
-								<!-- <p style="text-align: left;">verb</p>
-								<ol style="text-align: left;">
-									<li>make (something) appear larger than it is, especially with a lens or microscope.</li>
-									<li>extol; glorify.</li>
-								</ol> -->
 							</div>
 						</div>
 						<nav>
@@ -62,7 +57,7 @@
 										<td><a href="#event1">Click here for more info</a></td>
 									</tr>
 								</table>
-								<p>Events are made final by the Wednesday before, but are subject to change prior due to changes in weather. We have recently moved to Farmington Michigan, so future events will be in the surrounding areas.</p>
+								<p>Events are made final by the Wednesday before, but are subject to change prior due to changes in weather. We have recently moved to Farmington Michigan, so future events will be in that area.</p>
 								<a href="#email">Subscribe to our mailing list to be notified about upcoming events!</a>
 							</article>
 
@@ -156,28 +151,21 @@
 						<!-- Email List -->
 						<article id="email">
 							<h4 class="major">Subscribe to our mailing list to be notified about upcoming events as well as any updates!</h4>
-							<form>
-								<div style="height: 100%; width:75%; display: flex; justify-content: center; flex-wrap: wrap; margin: 0 auto;">
-									<label for="firstName">First Name</label>
-									<div class="break"></div>
-									<input name='firstName' class="form-control" placeholder="first name">
-									<div class="break"></div>
-									<label for="lastName">Last Name</label>
-									<div class="break"></div>
-									<input name='lastName' class="form-control" placeholder="last name">
-									<div class="break"></div>
-									<label for="email">Email</label>
-									<div class="break"></div>
-									<input name='email' class="form-control" placeholder="email">
-									<div class="break" style="height: 2rem;"></div>
-									<button type="submit" onClick="myFunction()">Submit</button>
-									<script>
-										function myFunction() {
-										  window.location.href="#added";  
-										}
-									</script>
-								</div>
-							  </form>
+							<div style="height: 100%; width:75%; display: flex; justify-content: center; flex-wrap: wrap; margin: 0 auto;">
+								<label for="firstName">First Name</label>
+								<div class="break"></div>
+								<input name='firstName' class="form-control" placeholder="first name" id="firstName">
+								<div class="break"></div>
+								<label for="lastName">Last Name</label>
+								<div class="break"></div>
+								<input name='lastName' class="form-control" placeholder="last name" id="lastName">
+								<div class="break"></div>
+								<label for="email">Email</label>
+								<div class="break"></div>
+								<input name='email' class="form-control" placeholder="email" id="emailAddress">
+								<div class="break" style="height: 2rem;"></div>
+								<button type="submit" onClick="subscribe()">Submit</button>
+							</div>
 						</article>
 
 						<!-- Successfully Added -->
@@ -207,3 +195,29 @@
 
 	</body>
 </html>
+
+<script>
+	function subscribe() {
+
+		let email = document.getElementById("emailAddress").value;
+		let firstName = document.getElementById("firstName").value;
+		let lastName = document.getElementById("lastName").value;
+
+		let payload = {
+			email,
+			firstName,
+			lastName
+		}
+
+		fetch('https://e75wjkegmh.execute-api.us-east-1.amazonaws.com/email', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(payload)
+		})
+
+		window.location.href = '#added';
+
+	}
+</script>

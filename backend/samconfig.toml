@@ -2,10 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "dev-nightskymagnify"
+stack_name = "prod-nightskymagnify"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-16fyvz0n20kua"
-s3_prefix = "dev-nightskymagnify"
+s3_prefix = "prod-nightskymagnify"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "env=\"dev\" TableName=\"nightskymagnify-email-list\" pk=\"email\""
+parameter_overrides = "env=\"prod\" TableName=\"nightskymagnify-email-list\" pk=\"email\""

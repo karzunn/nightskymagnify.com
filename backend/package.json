@@ -4,6 +4,8 @@
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.214.0",
         "@aws-sdk/util-dynamodb": "^3.214.0",
-        "lambda-api": "https://github.com/jeremydaly/lambda-api.git#v0.11"
+        "aws-sdk": "^2.1259.0",
+        "lambda-api": "https://github.com/jeremydaly/lambda-api.git#v0.11",
+        "nodemailer": "^6.8.0"
     }
 }
