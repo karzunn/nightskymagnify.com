@@ -197,6 +197,7 @@
 </html>
 
 <script>
+
 	function subscribe() {
 
 		let email = document.getElementById("emailAddress").value;
@@ -219,5 +220,21 @@
 
 		window.location.href = '#added';
 
+	}
+
+	function unsubscribe() {
+
+		let urlParams = new URLSearchParams(window.location.search);
+		let email = urlParams.get("email");
+		let id = urlParams.get("id");
+		if (!email || !id) return;
+		fetch(`https://e75wjkegmh.execute-api.us-east-1.amazonaws.com/email?email=${encodeURIComponent(email)}&id=${id}`, {
+			method: 'DELETE'
+		});	
+
+	}
+
+	if (window.location.hash == "#removed") {
+		unsubscribe()
 	}
 </script>
